@@ -33,7 +33,8 @@ class Crowd(data.Dataset):
                  method='train'):
 
         self.root_path = root_path
-        self.im_list = sorted(glob(os.path.join(self.root_path, '*.jpg')))
+        self.im_list = sorted(path for path in glob(os.path.join(self.root_path, '*.jpg'))
+                              if not os.path.basename(path).startswith('._'))
         if method not in ['train', 'val']:
             raise Exception("not implement")
         self.method = method
