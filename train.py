@@ -15,15 +15,15 @@ from utils.regression_trainer_cosine_multibatch import RegTrainer
 def parse_args():
     parser = argparse.ArgumentParser(description='Train Swin + MAN')
     parser.add_argument('--model-name', choices=['swin_l_trans', 'swin_t_trans'],
-                        default='swin_l_trans',
+                        default='swin_t_trans',
                         help='Swin-L has 24 attention blocks; Swin-T has 12')
-    parser.add_argument('--stage', choices=['both', 'baseline', 'lora'], default='both',
+    parser.add_argument('--stage', choices=['both', 'baseline', 'lora'], default='lora',
                         help='run baseline then LoRA, or select one stage')
     parser.add_argument('--data-dir', default='SHA/clean',
                         help='clean baseline root containing train/ and val/')
     parser.add_argument('--lora-train-dir', default='SHA/hazy/train')
     parser.add_argument('--lora-val-dir', default='SHA/mix/val')
-    parser.add_argument('--baseline-checkpoint', default='',
+    parser.add_argument('--baseline-checkpoint', default='model/swin_t_trans/baseline/0922-200006/best_model.pth',
                         help='trained clean baseline .pth or .tar for LoRA-only training')
     parser.add_argument('--pretrained-path',
                         default='pre_models/swin_large_patch4_window12_384_22k.pth',
@@ -36,8 +36,8 @@ def parse_args():
     parser.add_argument('--seed', type=int, default=42)
     parser.add_argument('--save-dir', default='model')
     parser.add_argument('--save-all', action='store_true')
-    parser.add_argument('--lr', type=float, default=5e-6)
-    parser.add_argument('--lora-lr', type=float, default=1e-4)
+    parser.add_argument('--lr', type=float, default=5*1e-6)
+    parser.add_argument('--lora-lr', type=float, default=2e-4)
     parser.add_argument('--weight-decay', type=float, default=1e-5)
     parser.add_argument('--resume', default='',
                         help='continue the selected stage from its .tar checkpoint')
@@ -46,16 +46,16 @@ def parse_args():
                         help='number of clean baseline training epochs')
     parser.add_argument('--pretrain-val-epoch', type=int, default=5,
                         help='validate the baseline every N pretrain epochs')
-    parser.add_argument('--pretrain-val-start', type=int, default=100,
+    parser.add_argument('--pretrain-val-start', type=int, default=5,
                         help='first zero-based pretrain epoch eligible for validation')
     parser.add_argument('--lora-epochs', '--max-epoch', dest='lora_epochs',
-                        type=int, default=1200,
+                        type=int, default=2000,
                         help='number of LoRA training epochs')
     parser.add_argument('--lora-val-epoch', '--val-epoch', dest='lora_val_epoch',
                         type=int, default=5,
                         help='validate LoRA every N LoRA training epochs')
     parser.add_argument('--lora-val-start', '--val-start', dest='lora_val_start',
-                        type=int, default=500,
+                        type=int, default=200,
                         help='first zero-based LoRA epoch eligible for validation')
     parser.add_argument('--batch-size', type=int, default=4)
     parser.add_argument('--device', default='0')
@@ -63,7 +63,7 @@ def parse_args():
     parser.add_argument('--tensorboard-log-interval', type=int, default=10,
                         help='batch interval for TensorBoard and train.log loss')
     parser.add_argument('--is-gray', action='store_true')
-    parser.add_argument('--crop-size', type=int, default=256)
+    parser.add_argument('--crop-size', type=int, default=384)
     parser.add_argument('--downsample-ratio', type=int, default=16)
     parser.add_argument('--use-background', type=bool, default=True)
     parser.add_argument('--sigma', type=float, default=8.0)
